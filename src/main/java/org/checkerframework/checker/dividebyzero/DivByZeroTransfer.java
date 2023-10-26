@@ -72,6 +72,26 @@ public class DivByZeroTransfer extends CFTransfer {
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
         // TODO
+        if(operator.equals(Comparison.LT)) {
+            if(equal(rhs, reflect(Zero.class))) {
+                return reflect((NonZero.class));
+            }
+        }
+        if(operator.equals(Comparison.EQ)) {
+            return rhs;
+        }
+        if(operator.equals(Comparison.NE)) {
+            if(equal(rhs, reflect(NonZero.class))) {
+                return reflect(Zero.class);
+            } else if(equal(rhs, reflect(Zero.class))) {
+                return reflect(NonZero.class);
+            }
+        }
+        if(operator.equals(Comparison.GT)) {
+            if(equal(rhs, reflect(Zero.class))) {
+                return reflect((NonZero.class));
+            }
+        }
         return lhs;
     }
 
@@ -93,7 +113,42 @@ public class DivByZeroTransfer extends CFTransfer {
             BinaryOperator operator,
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
-        // TODO
+        if (operator.equals(BinaryOperator.MINUS) || operator.equals(BinaryOperator.PLUS)) {
+            if(equal(rhs, reflect((Zero.class))) && equal(lhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            if(equal(rhs, reflect(Zero.class))) {
+                return lhs;
+            }
+            if(equal(lhs, reflect(Zero.class))) {
+                return rhs;
+            }
+            return reflect(Top.class);
+        }
+        if (operator.equals(BinaryOperator.TIMES)) {
+            if(equal(rhs, reflect((Zero.class))) && equal(lhs, reflect(Zero.class))) {
+                return reflect(Zero.class);
+            }
+            if(equal(rhs, reflect(Zero.class))) {
+                return lhs;
+            }
+            if(equal(lhs, reflect(Zero.class))) {
+                return rhs;
+            }
+            return reflect(NonZero.class);
+        }
+        if (operator.equals(BinaryOperator.DIVIDE) || operator.equals(BinaryOperator.MOD)) {
+            if(equal(rhs, reflect((Zero.class))) && equal(lhs, reflect(Zero.class))) {
+                return reflect(Top.class);
+            }
+            if(equal(rhs, reflect(Top.class))) {
+                return lhs;
+            }
+            if(equal(lhs, reflect(Zero.class))) {
+                return rhs;
+            }
+            return reflect(NonZero.class);
+        }
         return top();
     }
 
